@@ -5,7 +5,7 @@ var util = require('util'),
     cheerio = require('cheerio'),
     VError = require('verror');
 
-var BTCMarkets = function(key, secret, server, timeout)
+var BTCMarkets = function BTCMarkets(key, secret, server, timeout)
 {
     this.key = key;
     this.secret = secret;
@@ -164,21 +164,29 @@ BTCMarkets.prototype.getTrades = function(instrument, currency, callback, since)
 
 BTCMarkets.prototype.createOrder = function createOrder(instrument, currency, price, volume, orderSide, ordertype, clientRequestId, callback)
 {
-    this.privateRequest('/order/create', callback, {
+    var params = {
         currency: currency,
         instrument: instrument,
         price: price,
         volume: volume,
         orderSide: orderSide,
         ordertype: ordertype,
-        clientRequestId: clientRequestId}
-    );
+        clientRequestId: clientRequestId};
+
+    this.privateRequest('/order/create', callback, params);
 };
 
 BTCMarkets.prototype.cancelOrders = function cancelOrders(orderIds, callback)
 {
     this.privateRequest('/order/cancel', callback, {
         orderIds: orderIds}
+    );
+};
+
+BTCMarkets.prototype.getOrderDetail = function getOrderDetail(orderIds, callback)
+{
+    this.privateRequest('/order/detail', callback, {
+            orderIds: orderIds}
     );
 };
 
