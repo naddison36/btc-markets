@@ -4,11 +4,11 @@
     "description": "BTC Markets API Client for Node.JS",
     "main": "index.js",
     "dependencies": {
-        "request": ">=2.40.0",
-        "underscore": ">=1.6.0",
-        "crypto": "0.0.3",
-        "cheerio": "0.17.0",
-        "verror": "1.4.0"
+        "request": "~2.48.0",
+        "underscore": "~1.7.0",
+        "crypto": "~0.0.3",
+        "cheerio": "~0.17.0",
+        "verror": "~1.6.0"
     },
     "keywords": [
         "BTC Markets",

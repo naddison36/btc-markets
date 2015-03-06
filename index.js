@@ -23,7 +23,6 @@ BTCMarkets.prototype.privateRequest = function(path, callback, params)
     if(!this.key || !this.secret)
     {
         var error = new VError('%s must provide key and secret to make this API request.', functionName);
-        logger.error(error.stack);
         return callback(error);
     }
 
