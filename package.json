@@ -1,6 +1,6 @@
 {
     "name": "btc-markets",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "BTC Markets API Client for Node.JS",
     "main": "index.js",
     "dependencies": {
