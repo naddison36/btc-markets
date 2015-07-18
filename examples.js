@@ -26,15 +26,17 @@ client.getOrderBook("BTC", "AUD", function(err, data)
 });
 
 // limit buy order for of 0.01 BTC at 230 AUD
-client.createOrder("BTC", "AUD", 230 * numberConverter, 0.01 * numberConverter, 'Bid', 'Limit', 10001, function(err, data)
+client.createOrder("BTC", "AUD", 230 * numberConverter, 0.01 * numberConverter, 'Bid', 'Limit', "10001", function(err, data)
 {
-    console.log('id ' + data.id);
+    console.log(err);
+    console.log(data);
 });
 
-// market sell for 0.0001 BTC
+//market sell for 0.0001 BTC
 client.createOrder("BTC", "AUD", null, 0.0001 * numberConverter, 'Ask', 'Market', null, function(err, data)
 {
-    console.log('id ' + data.id);
+    console.log(err);
+    console.log(data);
 });
 
 // cancel two limit orders with id's 123456 and 987654
