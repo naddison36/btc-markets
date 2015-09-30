@@ -25,43 +25,56 @@ client.getOrderBook("BTC", "AUD", function(err, data)
         ' and amount ' + data.asks[0][1]);
 });
 
-// limit buy order for of 0.01 BTC at 230 AUD
-client.createOrder("BTC", "AUD", 230 * numberConverter, 0.01 * numberConverter, 'Bid', 'Limit', "10001", function(err, data)
-{
-    console.log(err);
-    console.log(data);
-});
-
-//market sell for 0.0001 BTC
-client.createOrder("BTC", "AUD", null, 0.0001 * numberConverter, 'Ask', 'Market', null, function(err, data)
-{
-    console.log(err);
-    console.log(data);
-});
-
-// cancel two limit orders with id's 123456 and 987654
-client.cancelOrder([123456,987654], function(err, data)
-{
-    console.log('first order was cancelled ' + data.responses[0].success);
-});
-
-client.getAccountBalances(function(err, data)
-{
-    data.forEach(function(account)
-    {
-        console.log(account.currency + ' balance ' + account.balance / numberConverter + ' pending ' + account.pendingFunds / numberConverter);
-    });
-});
-
-// get order details
-client.getOrderDetail([23988196, 23987987], function(err, data)
-{
-    if (err)
-    {
-        console.log(err);
-    }
-    else
-    {
-        console.log(data);
-    }
-});
+//// limit buy order for of 0.01 BTC at 230 AUD
+//client.createOrder("BTC", "AUD", 230 * numberConverter, 0.01 * numberConverter, 'Bid', 'Limit', "10001", function(err, data)
+//{
+//    console.log(err);
+//    console.log(data);
+//});
+//
+////market sell for 0.0001 BTC
+//client.createOrder("BTC", "AUD", null, 0.0001 * numberConverter, 'Ask', 'Market', null, function(err, data)
+//{
+//    console.log(err);
+//    console.log(data);
+//});
+//
+//// cancel two limit orders with id's 123456 and 987654
+//client.cancelOrder([123456,987654], function(err, data)
+//{
+//    console.log('first order was cancelled ' + data.responses[0].success);
+//});
+//
+//client.getAccountBalances(function(err, data)
+//{
+//    data.forEach(function(account)
+//    {
+//        console.log(account.currency + ' balance ' + account.balance / numberConverter + ' pending ' + account.pendingFunds / numberConverter);
+//    });
+//});
+//
+//// get order details
+//client.getOrderDetail([23988196, 23987987], function(err, data)
+//{
+//    if (err)
+//    {
+//        console.log(err);
+//    }
+//    else
+//    {
+//        console.log(data);
+//    }
+//});
+//
+//// get my trades since 1 July 2014
+//client.getTradeHistory("BTC", "AUD", 10, 1404172800, function(err, data)
+//{
+//    if (err)
+//    {
+//        console.log(err);
+//    }
+//    else
+//    {
+//        console.log(data);
+//    }
+//});
