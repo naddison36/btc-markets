@@ -12,19 +12,19 @@ var client = new BTCMarkets(key, secret);
 
 var numberConverter = 100000000;    // one hundred million
 
-// get latest prices
-client.getTick("BTC", "AUD", function(err, data)
-{
-    console.log('bid ' + data.bestBid + ' ask ' + data.bestAsk + ' last price ' + data.lastPrice);
-});
-
-// get order book
-client.getOrderBook("BTC", "AUD", function(err, data)
-{
-    console.log(data.asks.length + ' asks with best ask having price ' + data.asks[0][0] +
-        ' and amount ' + data.asks[0][1]);
-});
-
+//// get latest prices
+//client.getTick("BTC", "AUD", function(err, data)
+//{
+//    console.log('bid ' + data.bestBid + ' ask ' + data.bestAsk + ' last price ' + data.lastPrice);
+//});
+//
+//// get order book
+//client.getOrderBook("BTC", "AUD", function(err, data)
+//{
+//    console.log(data.asks.length + ' asks with best ask having price ' + data.asks[0][0] +
+//        ' and amount ' + data.asks[0][1]);
+//});
+//
 //// limit buy order for of 0.01 BTC at 230 AUD
 //client.createOrder("BTC", "AUD", 230 * numberConverter, 0.01 * numberConverter, 'Bid', 'Limit', "10001", function(err, data)
 //{
@@ -65,16 +65,31 @@ client.getOrderBook("BTC", "AUD", function(err, data)
 //        console.log(data);
 //    }
 //});
-//
-//// get my trades since 1 July 2014
-//client.getTradeHistory("BTC", "AUD", 10, 1404172800, function(err, data)
-//{
-//    if (err)
-//    {
-//        console.log(err);
-//    }
-//    else
-//    {
-//        console.log(data);
-//    }
-//});
+
+//33434568724
+//1404172800
+// get 10 trades since the start of time
+client.getTradeHistory("BTC", "AUD", 10, 1, function(err, data)
+{
+    if (err)
+    {
+        console.log(err);
+    }
+    else
+    {
+        console.log(data);
+    }
+});
+
+// get 10 orders since the start of time
+client.getOrderHistory("BTC", "AUD", 10, 1, function(err, data)
+{
+    if (err)
+    {
+        console.log(err);
+    }
+    else
+    {
+        console.log(data);
+    }
+});
