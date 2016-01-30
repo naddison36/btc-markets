@@ -106,6 +106,16 @@ function executeRequest(options, requestDesc, callback)
             error = new VError(err, '%s failed %s', functionName, requestDesc);
             error.name = err.code;
         }
+        else if (response.statusCode < 200 || response.statusCode >= 300)
+        {
+            error = new VError('%s HTTP status code %s returned from %s. Status message: %s', functionName,
+                response.statusCode, requestDesc, response.statusMessage);
+            error.name = response.statusCode;
+        }
+        else if (!data)
+        {
+            error = new VError('%s failed %s. No data returned.', functionName, requestDesc );
+        }
         // if request was not able to parse json response into an object
         else if (!_.isObject(data) )
         {
