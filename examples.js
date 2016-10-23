@@ -54,7 +54,7 @@ var numberConverter = 100000000;    // one hundred million
 //});
 //
 //// get order details
-//client.getOrderDetail([23988196, 23987987], function(err, data)
+//client.getOrderDetail([206855175, 23988196], function(err, data)
 //{
 //    if (err)
 //    {
@@ -93,8 +93,8 @@ var numberConverter = 100000000;    // one hundred million
 //        console.log(data);
 //    }
 //});
-
-client.getOpenOrders('BTC', 'AUD', 10, null, function(err, orders)
-{
-    console.log(err, orders);
-});
+//
+// client.getOpenOrders('BTC', 'AUD', 10, null, function(err, orders)
+// {
+//     console.log(err, orders);
+// });
