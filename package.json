@@ -1,19 +1,20 @@
 {
     "name": "btc-markets",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "BTC Markets API Client for Node.JS",
     "main": "index.js",
     "dependencies": {
-        "request": "~2.81.0",
+        "request": "~2.83.0",
         "underscore": "~1.8.3",
         "cheerio": "~0.19.0",
         "verror": "~1.6.0"
     },
     "keywords": [
         "BTC Markets",
-        "api",
+        "API",
         "exchange",
-        "bitcoin",
+        "Bitcoin",
+        "Ethereum",
         "Australia",
         "trading"
     ],

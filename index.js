@@ -234,4 +234,25 @@ BTCMarkets.prototype.getAccountBalances = function getAccounts(callback)
     this.privateRequest('/account/balance', callback);
 };
 
+BTCMarkets.prototype.withdrawCrypto = function withdrawCrypto(amount, address, crypto, callback)
+{
+    this.privateRequest('/fundtransfer/withdrawCrypto', callback, {
+        amount:amount,
+        address:address,
+        currency:crypto
+    });
+};
+
+BTCMarkets.prototype.withdrawEFT = function withdrawEFT(accountName, accountNumber, bankName, bsbNumber, amount, callback)
+{
+    this.privateRequest('/fundtransfer/withdrawEFT', callback, {
+        accountName:accountName,
+        accountNumber:accountNumber,
+        bankName:bankName,
+        bsbNumber:bsbNumber,
+        amount:amount,
+        currency:"AUD"
+    });
+};
+
 module.exports = BTCMarkets;
