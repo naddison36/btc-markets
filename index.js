@@ -74,8 +74,6 @@ BTCMarkets.prototype.privateRequest = function(path, callback, params)
 
 BTCMarkets.prototype.publicRequest = function(instrument, currency, action, callback, params)
 {
-    var functionName = 'BTCMarkets.publicRequest()';
-
     var headers = {"User-Agent": "BTC Markets Javascript API Client"};
 
     var path = '/market/' + instrument + '/' + currency + '/' + action;
@@ -85,7 +83,8 @@ BTCMarkets.prototype.publicRequest = function(instrument, currency, action, call
         method: 'GET',
         headers: headers,
         timeout: this.timeout,
-        json: {} };
+        json: {},
+        qs: params };
 
     var requestDesc = util.format('%s request to url %s',
         options.method, options.url);
