@@ -52,8 +52,8 @@ BTCMarkets.prototype.privateRequest = function(path, callback, params)
 
     var method = 'POST';    // most API's use HTTP POST so setting as default
 
-    // The exception is /account/balance which does a HTTP GET
-    if (path === '/account/balance')
+    // The exception is endpoints under /account/ which do a HTTP GET. eg /account/balance or /account/{instrument}/{currency}/tradingfee
+    if (path.split('/')[1] === 'account')
     {
         method = 'GET';
         params = {};
@@ -231,6 +231,11 @@ BTCMarkets.prototype.getTradeHistory = function getTradeHistory(instrument, curr
 BTCMarkets.prototype.getAccountBalances = function getAccounts(callback)
 {
     this.privateRequest('/account/balance', callback);
+};
+
+BTCMarkets.prototype.getTradingFee = function getTradingFee(instrument, currency, callback)
+{
+    this.privateRequest('/account/' + instrument + "/" + currency + "/" + 'tradingfee', callback);
 };
 
 BTCMarkets.prototype.withdrawCrypto = function withdrawCrypto(amount, address, crypto, callback)

@@ -26,40 +26,24 @@ var numberConverter = 100000000;    // one hundred million
 //});
 // client.getTrades("BTC", "AUD", function(err, data)
 // {
-//     if (err)
-//     {
-//         console.log(err);
-//     }
-//     else
-//     {
-//         console.log(data);
-//     }
+//     console.log(err, data);
 // });
 // // get trades since a trade id
 // client.getTrades("BTC", "AUD", function(err, data)
 // {
-//     if (err)
-//     {
-//         console.log(err);
-//     }
-//     else
-//     {
-//         console.log(data);
-//     }
+//     console.log(err, data);
 // }, 728992317);
 //
 //// limit buy order for of 0.01 BTC at 230 AUD
 //client.createOrder("BTC", "AUD", 230 * numberConverter, 0.01 * numberConverter, 'Bid', 'Limit', "10001", function(err, data)
 //{
-//    console.log(err);
-//    console.log(data);
+//    console.log(err, data);
 //});
 //
 ////market sell for 0.0001 BTC
 //client.createOrder("BTC", "AUD", null, 0.0001 * numberConverter, 'Ask', 'Market', null, function(err, data)
 //{
-//    console.log(err);
-//    console.log(data);
+//    console.log(err, data);
 //});
 //
 //// cancel two limit orders with id's 123456 and 987654
@@ -68,25 +52,23 @@ var numberConverter = 100000000;    // one hundred million
 //    console.log('first order was cancelled ' + data.responses[0].success);
 //});
 //
-//client.getAccountBalances(function(err, data)
-//{
+// client.getAccountBalances(function(err, data)
+// {
 //    data.forEach(function(account)
 //    {
 //        console.log(account.currency + ' balance ' + account.balance / numberConverter + ' pending ' + account.pendingFunds / numberConverter);
 //    });
-//});
+// });
+//
+// client.getTradingFee("BTC", "AUD", function(err, data)
+// {
+//     console.log(err, data);
+// });
 //
 //// get order details
 //client.getOrderDetail([206855175, 23988196], function(err, data)
 //{
-//    if (err)
-//    {
-//        console.log(err);
-//    }
-//    else
-//    {
-//        console.log(data);
-//    }
+//    console.log(err, data);
 //});
 //
 ////33434568724
@@ -94,26 +76,12 @@ var numberConverter = 100000000;    // one hundred million
 // get 10 trades since the start of time
 // client.getTradeHistory("BTC", "AUD", 10, 1, function(err, data)
 // {
-//    if (err)
-//    {
-//        console.log(err);
-//    }
-//    else
-//    {
-//        console.log(data);
-//    }
+//    console.log(err, data);
 // });
 //// get 10 orders since the start of time
 //client.getOrderHistory("BTC", "AUD", 10, 1, function(err, data)
 //{
-//    if (err)
-//    {
-//        console.log(err);
-//    }
-//    else
-//    {
-//        console.log(data);
-//    }
+//    console.log(err, data);
 //});
 //
 //client.getOpenOrders('BTC', 'AUD', 10, null, function(err, orders)
