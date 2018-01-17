@@ -10,14 +10,33 @@ export = BTCMarkets;
 
 declare class BTCMarkets
 {
-    constructor(key: string,
-                secret: string,
-                server: string,
-                timeout: number);
+    key: string;
+    secret: string;
+    server: string;
+    timeout: number;
 
     static numberConverter: number;
 
-    getTick(instrument: string, currency: string, callback: (err: Error, data: BTCMarkets.Tick)=>void): void;
+    constructor(key: string, secret: string, server?: string, timeout?: number);
+
+    protected privateRequest(path: string, params?: object): Promise<object>;
+    protected publicRequest(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, action: string, params?: object): Promise<object>;
+    protected executeRequest(options: request.OptionsWithUrl, requestDesc: string): Promise<object>;
+
+    getTick(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies): Promise<BTCMarkets.Tick>;
+    getOrderBook(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies): Promise<BTCMarkets.OrderBook>;
+    getTrades(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, since?: number): Promise<BTCMarkets.Trade[]>;
+    createOrder(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, price: number | void, volume: number, orderSide: BTCMarkets.OrderSide, ordertype: BTCMarkets.OrderType, clientRequestId?: string | void): Promise<BTCMarkets.NewOrder>;
+    cancelOrders(orderIds: number[]): Promise<BTCMarkets.CancelledOrders>;
+    getOrderDetail(orderIds: number[]): Promise<BTCMarkets.Orders>;
+    getOpenOrders(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, limit?: number | void, since?: number | null): Promise<BTCMarkets.Orders>;
+    getOrderHistory(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, limit?: number | void, since?: number | null): Promise<BTCMarkets.Orders>;
+    getTradeHistory(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, limit?: number | void, since?: number | null): Promise<BTCMarkets.Trades>;
+    getAccountBalances(): Promise<BTCMarkets.Balance[]>;
+    getTradingFee(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies): Promise<BTCMarkets.TradingFee>;
+    withdrawCrypto(amount: number, address: string, crypto: string): Promise<BTCMarkets.CryptoWithdrawal>;
+    withdrawEFT(accountName: string, accountNumber: string, bankName: string, bsbNumber: string, amount: number): Promise<BTCMarkets.BankWithdrawal>;
+    withdrawHistory(limit: number | void, since: number | void, indexForward: boolean | void): Promise<BTCMarkets.FundWithdrawals>;
 }
 
 declare namespace BTCMarkets
