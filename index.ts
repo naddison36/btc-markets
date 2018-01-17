@@ -3,7 +3,7 @@
 import {Buffer} from 'buffer';
 import {createHmac} from 'crypto';
 import * as request from 'request';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import * as VError from 'verror';
 
 export default class BTCMarkets
@@ -19,12 +19,11 @@ export default class BTCMarkets
 
     protected privateRequest(
         path: string,
-        callback: (err: Error, data: object)=>void,
-        params?: object)
+        params?: object): Promise<object>
     {
         if(!this.key || !this.secret)
         {
-            return callback(new VError('must provide key and secret to make this API request.'), null);
+            throw new VError('must provide key and secret to make this API request.');
         }
 
         // milliseconds elapsed between 1 January 1970 00:00:00 UTC and the given date
@@ -70,15 +69,14 @@ export default class BTCMarkets
 
         const requestDesc = `${options.method} request to url ${options.url} with message ${message}`;
 
-        this.executeRequest(options, requestDesc, callback);
+        return this.executeRequest(options, requestDesc);
     }
 
     protected publicRequest(
         instrument: BTCMarkets.instruments,
         currency: BTCMarkets.currencies,
         action: string,
-        callback: (err: Error, data: object)=>void,
-        params?: object)
+        params?: object): Promise<object>
     {
         const headers = {"User-Agent": "BTC Markets Javascript API Client"};
 
@@ -94,57 +92,63 @@ export default class BTCMarkets
 
         const requestDesc = `${options.method} request to url ${options.url} with parameters ${JSON.stringify(params)}`;
 
-        this.executeRequest(options, requestDesc, callback)
+        return this.executeRequest(options, requestDesc);
     };
 
     protected executeRequest(
         options: request.OptionsWithUrl,
-        requestDesc: string,
-        callback: (err: Error, data: object)=>void)
+        requestDesc: string): Promise<object>
     {
-        request(options, function(err: any, response: request.RequestResponse, data: object)
+        return new Promise((resolve, reject) =>
         {
-            let error = null;   // default to no errors
+            request(options, function(err: any,
+                                      response: request.RequestResponse,
+                                      data: BTCMarkets.BaseResponse)
+            {
+                let error = null;   // default to no errors
 
-            if(err)
-            {
-                error = new VError(err, `failed ${requestDesc} with error message ${err.message}`);
-                error.name = err.code;
-            }
-            else if (response.statusCode < 200 || response.statusCode >= 300)
-            {
-                error = new VError(`HTTP status code ${response.statusCode} returned from ${requestDesc}. Status message: ${response.statusMessage}`);
-                error.name = response.statusCode;
-            }
-            else if (!data)
-            {
-                error = new VError(`failed ${requestDesc}. No data returned.`);
-            }
-            // if request was not able to parse json response into an object
-            else if (data !== Object(data))
-            {
-                // try and parse HTML body form response
-                const $ = cheerio.load(data);
-
-                const responseBody = $('body').text();
-
-                if (responseBody)
+                if(err)
                 {
-                    error = new VError(err, `Could not parse response body from ${requestDesc}\nResponse body: ${responseBody}`);
-                    error.name = responseBody;
+                    error = new VError(err, `failed ${requestDesc} with error message ${err.message}`);
+                    error.name = err.code;
                 }
-                else
+                else if (response.statusCode < 200 || response.statusCode >= 300)
                 {
-                    error = new VError(err, `Could not parse json or HTML response from ${requestDesc}`);
+                    error = new VError(`HTTP status code ${response.statusCode} returned from ${requestDesc}. Status message: ${response.statusMessage}`);
+                    error.name = response.statusCode.toString();
                 }
-            }
-            else if (data.hasOwnProperty('success') && !data.success)
-            {
-                error = new VError(`failed ${requestDesc}. Success: ${data.success}. Error message: ${data.errorMessage}`);
-                error.name = data.errorMessage;
-            }
+                else if (!data)
+                {
+                    error = new VError(`failed ${requestDesc}. No data returned.`);
+                }
+                // if request was not able to parse json response into an object
+                else if (data !== Object(data))
+                {
+                    // try and parse HTML body form response
+                    const $ = cheerio.load(data);
 
-            callback(error, data);
+                    const responseBody = $('body').text();
+
+                    if (responseBody)
+                    {
+                        error = new VError(err, `Could not parse response body from ${requestDesc}\nResponse body: ${responseBody}`);
+                        error.name = responseBody;
+                    }
+                    else
+                    {
+                        error = new VError(err, `Could not parse json or HTML response from ${requestDesc}`);
+                    }
+                }
+                else if (data.hasOwnProperty('success') && !data.success)
+                {
+                    error = new VError(`failed ${requestDesc}. Success: ${data.success}. Error message: ${data.errorMessage}`);
+                    error.name = data.errorMessage;
+                }
+
+                if (error) reject(error);
+
+                resolve(data);
+            });
         });
     }
 
@@ -153,25 +157,25 @@ export default class BTCMarkets
     //
 
     getTick(instrument: BTCMarkets.instruments,
-            currency: BTCMarkets.currencies,
-            callback: (err: Error, data: BTCMarkets.Tick)=>void): void
+            currency: BTCMarkets.currencies): Promise<BTCMarkets.Tick>
     {
-        this.publicRequest(instrument, currency, 'tick', callback);
+        // @ts-ignore
+        return this.publicRequest(instrument, currency, 'tick');
     };
 
     getOrderBook(instrument: BTCMarkets.instruments,
-                 currency: BTCMarkets.currencies,
-                 callback: (err: Error, data: BTCMarkets.OrderBook)=>void)
+                 currency: BTCMarkets.currencies): Promise<BTCMarkets.OrderBook>
     {
-        this.publicRequest(instrument, currency, 'orderbook', callback);
+        // @ts-ignore
+        return this.publicRequest(instrument, currency, 'orderbook');
     };
 
     getTrades(instrument: BTCMarkets.instruments,
               currency: BTCMarkets.currencies,
-              callback: (err: Error, data: BTCMarkets.Trade[])=>void,
-              since: number)
+              since?: number): Promise<BTCMarkets.Trade[]>
     {
-        this.publicRequest(instrument, currency, 'trades', callback, {
+        // @ts-ignore
+        return this.publicRequest(instrument, currency, 'trades', {
             since: since}
         );
     };
@@ -186,8 +190,8 @@ export default class BTCMarkets
                 volume: number,
                 orderSide: BTCMarkets.OrderSide,
                 ordertype: BTCMarkets.OrderType,
-                clientRequestId: string | void = "",    // if no client id then set to an empty string
-                callback: (err: Error, order: BTCMarkets.NewOrder)=>void)
+                clientRequestId: string | void = ""    // if no client id then set to an empty string
+    ): Promise<BTCMarkets.NewOrder>
     {
         const params = {
             currency: currency,
@@ -199,21 +203,22 @@ export default class BTCMarkets
             clientRequestId: clientRequestId
         };
 
-        this.privateRequest('/order/create', callback, params);
+        // @ts-ignore
+        return this.privateRequest('/order/create', params);
     };
 
-    cancelOrders(orderIds: number[],
-                 callback: (err: Error, orders: BTCMarkets.CancelledOrders)=>void)
+    cancelOrders(orderIds: number[]): Promise<BTCMarkets.CancelledOrders>
     {
-        this.privateRequest('/order/cancel', callback, {
+        // @ts-ignore
+        return this.privateRequest('/order/cancel', {
             orderIds: orderIds}
         );
     };
 
-    getOrderDetail(orderIds: number[],
-                   callback: (err: Error, orders: BTCMarkets.Orders)=>void)
+    getOrderDetail(orderIds: number[]): Promise<BTCMarkets.Orders>
     {
-        this.privateRequest('/order/detail', callback, {
+        // @ts-ignore
+        return this.privateRequest('/order/detail', {
             orderIds: orderIds}
         );
     };
@@ -221,10 +226,10 @@ export default class BTCMarkets
     getOpenOrders(instrument: BTCMarkets.instruments,
                   currency: BTCMarkets.currencies,
                   limit: number | void = 10,
-                  since: number | null = null,
-                  callback: (err: Error, orders: BTCMarkets.Orders)=>void)
+                  since: number | null = null): Promise<BTCMarkets.Orders>
     {
-        this.privateRequest('/order/open', callback, {
+        // @ts-ignore
+        return this.privateRequest('/order/open', {
             currency: currency,
             instrument: instrument,
             limit: limit,
@@ -235,10 +240,10 @@ export default class BTCMarkets
     getOrderHistory(instrument: BTCMarkets.instruments,
                     currency: BTCMarkets.currencies,
                     limit: number | void = 100,
-                    since: number | null = null,
-                    callback: (err: Error, orders: BTCMarkets.Orders)=>void)
+                    since: number | null = null): Promise<BTCMarkets.Orders>
     {
-        this.privateRequest('/order/history', callback, {
+        // @ts-ignore
+        return this.privateRequest('/order/history', {
             currency: currency,
             instrument: instrument,
             limit: limit,
@@ -249,10 +254,10 @@ export default class BTCMarkets
     getTradeHistory(instrument: BTCMarkets.instruments,
                     currency: BTCMarkets.currencies,
                     limit: number | void = 100,
-                    since: number | null = null,
-                    callback: (err: Error, trades: BTCMarkets.Trades)=>void)
+                    since: number | null = null): Promise<BTCMarkets.Trades>
     {
-        this.privateRequest('/order/trade/history', callback, {
+        // @ts-ignore
+        return this.privateRequest('/order/trade/history', {
             currency: currency,
             instrument: instrument,
             limit: limit,
@@ -260,24 +265,25 @@ export default class BTCMarkets
         );
     };
 
-    getAccountBalances(callback: (err: Error, balances: BTCMarkets.Balance[])=>void)
+    getAccountBalances(): Promise<BTCMarkets.Balance[]>
     {
-        this.privateRequest('/account/balance', callback);
+        // @ts-ignore
+        return this.privateRequest('/account/balance');
     };
 
     getTradingFee(instrument: BTCMarkets.instruments,
-                  currency: BTCMarkets.currencies,
-                  callback: (err: Error, trades: BTCMarkets.TradingFee)=>void)
+                  currency: BTCMarkets.currencies): Promise<BTCMarkets.TradingFee>
     {
-        this.privateRequest('/account/' + instrument + "/" + currency + "/" + 'tradingfee', callback);
+        // @ts-ignore
+        return this.privateRequest('/account/' + instrument + "/" + currency + "/" + 'tradingfee');
     };
 
     withdrawCrypto(amount: number,
                    address: string,
-                   crypto: string,
-                   callback: (err: Error, result: BTCMarkets.CryptoWithdrawal)=>void)
+                   crypto: string): Promise<BTCMarkets.CryptoWithdrawal>
     {
-        this.privateRequest('/fundtransfer/withdrawCrypto', callback, {
+        // @ts-ignore
+        return this.privateRequest('/fundtransfer/withdrawCrypto', {
             amount: amount,
             address: address,
             currency: crypto
@@ -288,10 +294,10 @@ export default class BTCMarkets
                 accountNumber: string,
                 bankName: string,
                 bsbNumber: string,
-                amount: number,
-                callback: (err: Error, result: BTCMarkets.BankWithdrawal)=>void)
+                amount: number): Promise<BTCMarkets.BankWithdrawal>
     {
-        this.privateRequest('/fundtransfer/withdrawEFT', callback, {
+        // @ts-ignore
+        return this.privateRequest('/fundtransfer/withdrawEFT', {
             accountName: accountName,
             accountNumber: accountNumber,
             bankName: bankName,
@@ -303,10 +309,10 @@ export default class BTCMarkets
 
     withdrawHistory(limit: number | void,
                     since: number | void,
-                    indexForward: boolean | void,
-                    callback: (err: Error, result: BTCMarkets.FundWithdrawals)=>void)
+                    indexForward: boolean | void): Promise<BTCMarkets.FundWithdrawals>
     {
-        this.privateRequest('/fundtransfer/history', callback, {
+        // @ts-ignore
+        return this.privateRequest('/fundtransfer/history', {
             limit: limit,
             since: since,
             indexForward: indexForward

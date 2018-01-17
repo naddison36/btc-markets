@@ -46,9 +46,14 @@ Most cloud providers now offer solutions for securely storing API keys. For exam
 
 And while I'm at it, make sure you enable two factor authentication. Your account is very easy to hack without 2FA enabled. You have been warned!
 
+### Donations
+If you'd like to thank me for this library you can always donation some of your crypto trading profits to:
+* BTC 13CPGPRf63nVWFkdnJgmvC4K69YGeR4zNn
+* ETH 0x775053A6125cB51e618Eb132f00E93d6033934AD
+
 ### Examples
 The following is from [examples.js](./examples.js)
-```js
+```javascript
 //const BTCMarkets = require('btc-markets').default;  // if you are using JavaScript
 import BTCMarkets from 'btc-markets';   // if you are using TypeScript or Babel
 
@@ -63,95 +68,43 @@ const secret = process.argv[3] || 'your-api-secret';
 const client = new BTCMarkets(key, secret);
 
 // get latest prices
-client.getTick("BTC", "AUD", function(err, data)
-{
-   console.log(err, JSON.stringify(data));
-});
+const tick = await client.getTick("BTC", "AUD");
 
 // get order book
-client.getOrderBook("BTC", "AUD", function(err, data)
-{
-   console.log(data.asks.length + ' asks with best ask having price ' + data.asks[0][0] +
-       ' and amount ' + data.asks[0][1]);
-   console.log(err, JSON.stringify(data));
-});
+const orderBook = await client.getOrderBook("BTC", "AUD");
 
-client.getTrades("BTC", "AUD", function(err, data)
-{
-    console.log(err, JSON.stringify(data));
-});
-
-// get trades since a trade id
-client.getTrades("BTC", "AUD", function(err, data)
-{
-    console.log(err, data);
-}, 728992317);
+// get market trades since 728992317
+const trades = await client.getTrades("BTC", "AUD", 728992317);
 
 // limit buy order for of 0.001 ETH at 1000 AUD
-client.createOrder("ETH", "AUD", 500 * BTCMarkets.numberConverter, 0.001 * BTCMarkets.numberConverter, 'Bid', 'Limit', "10001", function(err, data)
-{
-   console.log(err, JSON.stringify(data));
-});
+const limitOrder = await client.createOrder("ETH", "AUD", 500 * BTCMarkets.numberConverter, 0.001 * BTCMarkets.numberConverter, 'Bid', 'Limit', "10001");
 
 //market sell for 0.001 BTC
-client.createOrder("BTC", "AUD", null, 0.001 * BTCMarkets.numberConverter, 'Ask', 'Market', null, function(err, data)
-{
-   console.log(err, JSON.stringify(data));
-});
+const marketOrder = await client.createOrder("BTC", "AUD", null, 0.001 * BTCMarkets.numberConverter, 'Ask', 'Market', null);
 
-// cancel two limit orders with id's 1132477709 and 1132477881
-client.cancelOrders([1132477709, 1132477881], function(err, data)
-{
-   console.log(err, JSON.stringify(data));
-});
+// cancel two limit orders with id's 1132477709 and 1133590603
+const cancelledOrders = await client.cancelOrders([1132477709, 1133590603]);
 
-client.getAccountBalances(function(err, data)
-{
-   data.forEach(function(account)
-   {
-       console.log(account.currency + ' balance ' + account.balance / BTCMarkets.numberConverter + ' pending ' + account.pendingFunds / BTCMarkets.numberConverter);
-   });
-   console.log(err, JSON.stringify(data));
-});
+const accountBalances = await client.getAccountBalances();
 
 // get trading fee for a trading pair
-client.getTradingFee("BTC", "AUD", function(err, data)
-{
-    console.log(err, JSON.stringify(data));
-});
+const tradingFee = await client.getTradingFee("BTC", "AUD");
 
 // get order details
-client.getOrderDetail([206855175, 23988196], function(err, data)
-{
-   console.log(err, JSON.stringify(data));
-});
+const orderDetails = await client.getOrderDetail([206855175, 23988196]);
 
 // get all trades since the start of time
-client.getTradeHistory("BTC", "AUD", undefined, null, function(err, data)
-{
-   console.log(err, JSON.stringify(data));
-});
+const tradeHistory = await client.getTradeHistory("BTC", "AUD", undefined, null);
 
 // get 50 orders since the start of time
-client.getOrderHistory("BTC", "AUD", 50, null, function(err, data)
-{
-   console.log(err, data);
-});
+const orderHistory = await client.getOrderHistory("BTC", "AUD", 50, null);
 
-client.getOpenOrders('BTC', 'AUD', 10, null, function(err, orders)
-{
-   console.log(err, orders);
-});
+// get my open orders
+const openOrders = await client.getOpenOrders('BTC', 'AUD', 10, null);
 
 // withdrawal 0.05 ETH
-client.withdrawCrypto(0.05 * BTCMarkets.numberConverter, "F777fc174776879eeD1855560C37Eded66389a3b", "ETH", function(err, data)
-{
-    console.log(err, JSON.stringify(data));
-});
+const cryptoWithdrawal = await client.withdrawCrypto(0.05 * BTCMarkets.numberConverter, "0x775053A6125cB51e618Eb132f00E93d6033934AD", "ETH");
 
 // withdrawal 0.05 ETH
-client.withdrawHistory(null, null, null, function(err, data)
-{
-    console.log(err, JSON.stringify(data));
-});
+const withdrawHistory = await client.withdrawHistory(null, null, null);
 ```

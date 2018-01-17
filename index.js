@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const buffer_1 = require("buffer");
 const crypto_1 = require("crypto");
 const request = require("request");
-const cheerio_1 = require("cheerio");
+const cheerio = require("cheerio");
 const VError = require("verror");
 class BTCMarkets {
     constructor(key, secret, server = 'https://api.btcmarkets.net', timeout = 20000) {
@@ -13,9 +13,9 @@ class BTCMarkets {
         this.server = server;
         this.timeout = timeout;
     }
-    privateRequest(path, callback, params) {
+    privateRequest(path, params) {
         if (!this.key || !this.secret) {
-            return callback(new VError('must provide key and secret to make this API request.'), null);
+            throw new VError('must provide key and secret to make this API request.');
         }
         // milliseconds elapsed between 1 January 1970 00:00:00 UTC and the given date
         const timestamp = (new Date()).getTime();
@@ -51,9 +51,9 @@ class BTCMarkets {
             json: params
         };
         const requestDesc = `${options.method} request to url ${options.url} with message ${message}`;
-        this.executeRequest(options, requestDesc, callback);
+        return this.executeRequest(options, requestDesc);
     }
-    publicRequest(instrument, currency, action, callback, params) {
+    publicRequest(instrument, currency, action, params) {
         const headers = { "User-Agent": "BTC Markets Javascript API Client" };
         const path = '/market/' + instrument + '/' + currency + '/' + action;
         const options = {
@@ -65,55 +65,62 @@ class BTCMarkets {
             qs: params
         };
         const requestDesc = `${options.method} request to url ${options.url} with parameters ${JSON.stringify(params)}`;
-        this.executeRequest(options, requestDesc, callback);
+        return this.executeRequest(options, requestDesc);
     }
     ;
-    executeRequest(options, requestDesc, callback) {
-        request(options, function (err, response, data) {
-            let error = null; // default to no errors
-            if (err) {
-                error = new VError(err, `failed ${requestDesc} with error message ${err.message}`);
-                error.name = err.code;
-            }
-            else if (response.statusCode < 200 || response.statusCode >= 300) {
-                error = new VError(`HTTP status code ${response.statusCode} returned from ${requestDesc}. Status message: ${response.statusMessage}`);
-                error.name = response.statusCode;
-            }
-            else if (!data) {
-                error = new VError(`failed ${requestDesc}. No data returned.`);
-            }
-            else if (data !== Object(data)) {
-                // try and parse HTML body form response
-                const $ = cheerio_1.default.load(data);
-                const responseBody = $('body').text();
-                if (responseBody) {
-                    error = new VError(err, `Could not parse response body from ${requestDesc}\nResponse body: ${responseBody}`);
-                    error.name = responseBody;
+    executeRequest(options, requestDesc) {
+        return new Promise((resolve, reject) => {
+            request(options, function (err, response, data) {
+                let error = null; // default to no errors
+                if (err) {
+                    error = new VError(err, `failed ${requestDesc} with error message ${err.message}`);
+                    error.name = err.code;
                 }
-                else {
-                    error = new VError(err, `Could not parse json or HTML response from ${requestDesc}`);
+                else if (response.statusCode < 200 || response.statusCode >= 300) {
+                    error = new VError(`HTTP status code ${response.statusCode} returned from ${requestDesc}. Status message: ${response.statusMessage}`);
+                    error.name = response.statusCode.toString();
                 }
-            }
-            else if (data.hasOwnProperty('success') && !data.success) {
-                error = new VError(`failed ${requestDesc}. Success: ${data.success}. Error message: ${data.errorMessage}`);
-                error.name = data.errorMessage;
-            }
-            callback(error, data);
+                else if (!data) {
+                    error = new VError(`failed ${requestDesc}. No data returned.`);
+                }
+                else if (data !== Object(data)) {
+                    // try and parse HTML body form response
+                    const $ = cheerio.load(data);
+                    const responseBody = $('body').text();
+                    if (responseBody) {
+                        error = new VError(err, `Could not parse response body from ${requestDesc}\nResponse body: ${responseBody}`);
+                        error.name = responseBody;
+                    }
+                    else {
+                        error = new VError(err, `Could not parse json or HTML response from ${requestDesc}`);
+                    }
+                }
+                else if (data.hasOwnProperty('success') && !data.success) {
+                    error = new VError(`failed ${requestDesc}. Success: ${data.success}. Error message: ${data.errorMessage}`);
+                    error.name = data.errorMessage;
+                }
+                if (error)
+                    reject(error);
+                resolve(data);
+            });
         });
     }
     //
     // Public API functions
     //
-    getTick(instrument, currency, callback) {
-        this.publicRequest(instrument, currency, 'tick', callback);
+    getTick(instrument, currency) {
+        // @ts-ignore
+        return this.publicRequest(instrument, currency, 'tick');
     }
     ;
-    getOrderBook(instrument, currency, callback) {
-        this.publicRequest(instrument, currency, 'orderbook', callback);
+    getOrderBook(instrument, currency) {
+        // @ts-ignore
+        return this.publicRequest(instrument, currency, 'orderbook');
     }
     ;
-    getTrades(instrument, currency, callback, since) {
-        this.publicRequest(instrument, currency, 'trades', callback, {
+    getTrades(instrument, currency, since) {
+        // @ts-ignore
+        return this.publicRequest(instrument, currency, 'trades', {
             since: since
         });
     }
@@ -122,8 +129,8 @@ class BTCMarkets {
     // Private API functions
     //
     createOrder(instrument, currency, price = 0, // price is not needed if a market order
-        volume, orderSide, ordertype, clientRequestId = "", // if no client id then set to an empty string
-        callback) {
+        volume, orderSide, ordertype, clientRequestId = "" // if no client id then set to an empty string
+    ) {
         const params = {
             currency: currency,
             instrument: instrument,
@@ -133,23 +140,27 @@ class BTCMarkets {
             ordertype: ordertype,
             clientRequestId: clientRequestId
         };
-        this.privateRequest('/order/create', callback, params);
+        // @ts-ignore
+        return this.privateRequest('/order/create', params);
     }
     ;
-    cancelOrders(orderIds, callback) {
-        this.privateRequest('/order/cancel', callback, {
+    cancelOrders(orderIds) {
+        // @ts-ignore
+        return this.privateRequest('/order/cancel', {
             orderIds: orderIds
         });
     }
     ;
-    getOrderDetail(orderIds, callback) {
-        this.privateRequest('/order/detail', callback, {
+    getOrderDetail(orderIds) {
+        // @ts-ignore
+        return this.privateRequest('/order/detail', {
             orderIds: orderIds
         });
     }
     ;
-    getOpenOrders(instrument, currency, limit = 10, since = null, callback) {
-        this.privateRequest('/order/open', callback, {
+    getOpenOrders(instrument, currency, limit = 10, since = null) {
+        // @ts-ignore
+        return this.privateRequest('/order/open', {
             currency: currency,
             instrument: instrument,
             limit: limit,
@@ -157,8 +168,9 @@ class BTCMarkets {
         });
     }
     ;
-    getOrderHistory(instrument, currency, limit = 100, since = null, callback) {
-        this.privateRequest('/order/history', callback, {
+    getOrderHistory(instrument, currency, limit = 100, since = null) {
+        // @ts-ignore
+        return this.privateRequest('/order/history', {
             currency: currency,
             instrument: instrument,
             limit: limit,
@@ -166,8 +178,9 @@ class BTCMarkets {
         });
     }
     ;
-    getTradeHistory(instrument, currency, limit = 100, since = null, callback) {
-        this.privateRequest('/order/trade/history', callback, {
+    getTradeHistory(instrument, currency, limit = 100, since = null) {
+        // @ts-ignore
+        return this.privateRequest('/order/trade/history', {
             currency: currency,
             instrument: instrument,
             limit: limit,
@@ -175,24 +188,28 @@ class BTCMarkets {
         });
     }
     ;
-    getAccountBalances(callback) {
-        this.privateRequest('/account/balance', callback);
+    getAccountBalances() {
+        // @ts-ignore
+        return this.privateRequest('/account/balance');
     }
     ;
-    getTradingFee(instrument, currency, callback) {
-        this.privateRequest('/account/' + instrument + "/" + currency + "/" + 'tradingfee', callback);
+    getTradingFee(instrument, currency) {
+        // @ts-ignore
+        return this.privateRequest('/account/' + instrument + "/" + currency + "/" + 'tradingfee');
     }
     ;
-    withdrawCrypto(amount, address, crypto, callback) {
-        this.privateRequest('/fundtransfer/withdrawCrypto', callback, {
+    withdrawCrypto(amount, address, crypto) {
+        // @ts-ignore
+        return this.privateRequest('/fundtransfer/withdrawCrypto', {
             amount: amount,
             address: address,
             currency: crypto
         });
     }
     ;
-    withdrawEFT(accountName, accountNumber, bankName, bsbNumber, amount, callback) {
-        this.privateRequest('/fundtransfer/withdrawEFT', callback, {
+    withdrawEFT(accountName, accountNumber, bankName, bsbNumber, amount) {
+        // @ts-ignore
+        return this.privateRequest('/fundtransfer/withdrawEFT', {
             accountName: accountName,
             accountNumber: accountNumber,
             bankName: bankName,
@@ -202,8 +219,9 @@ class BTCMarkets {
         });
     }
     ;
-    withdrawHistory(limit, since, indexForward, callback) {
-        this.privateRequest('/fundtransfer/history', callback, {
+    withdrawHistory(limit, since, indexForward) {
+        // @ts-ignore
+        return this.privateRequest('/fundtransfer/history', {
             limit: limit,
             since: since,
             indexForward: indexForward
