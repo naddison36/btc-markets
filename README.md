@@ -2,17 +2,17 @@ BTC Markets Javascript API Client
 ===============
 [![npm version](https://badge.fury.io/js/btc-markets.svg)](https://badge.fury.io/js/btc-markets)
 
-This is a node.js wrapper for the private and public methods exposed by the [BTC Markets API](https://github.com/BTCMarkets/API).
-You will need have a registered account with [BTC Markets](https://btcmarkets.net) and generated API keys to access the private methods.
+This library is a node.js wrapper for the private and public methods exposed by the [BTC Markets API](https://github.com/BTCMarkets/API).
+You will need to have a registered account with [BTC Markets](https://btcmarkets.net) and generated API keys to access the private methods.
 
-Please contact support@btcmarkets.net if you are having trouble opening and account or generating an API key. 
+Please contact support@btcmarkets.net if you are having trouble opening an account or generating an API key. 
 
 ### Install
 
 `npm install btc-markets`
 
-### Version 1.0.0
-This library has bee upgraded to be written in TypeScript and use promises. If you want the old version that used callbacks use [v0.0.10](https://github.com/naddison36/btc-markets/tree/v0.0.10).
+### Version 1.0.x
+This library has bee upgraded to be written in TypeScript and use promises. If you want the old version that used to callbacks, then use [v0.0.10](https://github.com/naddison36/btc-markets/tree/v0.0.10).
 
 Other changes are:
 - Removed the Underscore dependency
@@ -22,14 +22,14 @@ Other changes are:
 ### Design Principles
 - **thin** the client is just a simple wrapper to the BTC Markets API. There is no parameter validation as this is delegated to the BTC Market API server. Similarly, there is no data transformation.
 - **errors** all errors are returned as Error objects which can be used programmatically or for debugging
-- **no retries** it's up to the calling program to handle retries as it'll vary between programs. For example, error handling timeouts on mutable API calls like addTrade and cancelOrder is not as simple as retying the API call as the operation my have been successful on the exchange but the response back was not.
+- **no retries** it's up to the calling program to handle retries as it'll vary between programs. For example, error handling timeouts on mutable API calls like addTrade and cancelOrder is not as simple as retying the API call as the operation may have been successful on the exchange but the response back was not.
 
 ### Error handling
 The first parameter to each API function is a callback function which is passed error and data objects.
 
 The error object is an instance of [VError](https://github.com/davepacheco/node-verror) which is an extension of the standard Error object.
 The three main properties are:
-- **message** a description of the error with all the available information so problems in production can be diagnosed. For example the url, http request method, parameters, error codes and messages
+- **message** a description of the error with all the available information so problems in production can be diagnosed. For example, the url, http request method, parameters, error codes and messages
 - **name** the HTTP error code or BTC Markets error message so specific errors can be programatically detected.
 - **cause** the underlying error object. eg the error object from a failed request or json parse. Note there will be no cause error for BTC Markets errors
 
@@ -44,10 +44,10 @@ Most cloud providers now offer solutions for securely storing API keys. For exam
 * Azure [Key Vault](https://azure.microsoft.com/en-au/services/key-vault/)
 * Kubernetes [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
 
-And while I'm at it, make sure you enable two factor authentication. Your account is very easy to hack without 2FA enabled. You have been warned!
+And while I'm at it, make sure you enable two-factor authentication. Your account is easy to hack without 2FA enabled. You have been warned!
 
 ### Donations
-If you'd like to thank me for this library you can always donation some of your crypto trading profits to:
+If you'd like to thank me for this library, you can always donate some of your crypto trading profits to:
 * BTC 13CPGPRf63nVWFkdnJgmvC4K69YGeR4zNn
 * ETH 0x775053A6125cB51e618Eb132f00E93d6033934AD
 
