@@ -1,5 +1,6 @@
 BTC Markets Javascript API Client
 ===============
+[![npm version](https://badge.fury.io/js/btc-markets.svg)](https://badge.fury.io/js/btc-markets)
 
 This is a node.js wrapper for the private and public methods exposed by the [BTC Markets API](https://github.com/BTCMarkets/API).
 You will need have a registered account with [BTC Markets](https://btcmarkets.net) and generated API keys to access the private methods.
@@ -9,6 +10,14 @@ Please contact support@btcmarkets.net if you are having trouble opening and acco
 ### Install
 
 `npm install btc-markets`
+
+### Version 1.0.0
+This library has bee upgraded to be written in TypeScript and use promises. If you want the old version that used callbacks use [v0.0.10](https://github.com/naddison36/btc-markets/tree/v0.0.10).
+
+Other changes are:
+- Removed the Underscore dependency
+- Added static numberConverter to convert decimal numbers to BTC Markets API integers
+- Added withdrawalHistory API (still in preview so not tested)
 
 ### Design Principles
 - **thin** the client is just a simple wrapper to the BTC Markets API. There is no parameter validation as this is delegated to the BTC Market API server. Similarly, there is no data transformation.
@@ -24,56 +33,125 @@ The three main properties are:
 - **name** the HTTP error code or BTC Markets error message so specific errors can be programatically detected.
 - **cause** the underlying error object. eg the error object from a failed request or json parse. Note there will be no cause error for BTC Markets errors
 
+### Security Warning
+Do not commit your API keys into public source code repositories. These can be in code, config files or IDE config files used to run tests or processes.
+
+If you can't avoid committing API keys into your repo then use something like [git-crypt](https://github.com/AGWA/git-crypt).
+
+Most cloud providers now offer solutions for securely storing API keys. For example:
+* Google [Key Management Service (KMS](https://cloud.google.com/kms/)
+* AWS [Key Management Service (KMS)](https://aws.amazon.com/kms/)
+* Azure [Key Vault](https://azure.microsoft.com/en-au/services/key-vault/)
+* Kubernetes [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
+
+And while I'm at it, make sure you enable two factor authentication. Your account is very easy to hack without 2FA enabled. You have been warned!
+
 ### Examples
-
+The following is from [examples.js](./examples.js)
 ```js
-var BTCMarkets = require('btc-markets');
+//const BTCMarkets = require('btc-markets').default;  // if you are using JavaScript
+import BTCMarkets from 'btc-markets';   // if you are using TypeScript or Babel
 
-var client = new BTCMarkets(key, secret);
+// Either pass your API key and secret as the first and second parameters to examples.js. eg
+// node examples.js your-api-key your-api-secret
+//
+// Or enter them below.
+// WARNING never commit your API keys into a public repository.
+const key = process.argv[2] || 'your-api-key';
+const secret = process.argv[3] || 'your-api-secret';
 
-var numberConverter = 100000000;    // one hundred million
+const client = new BTCMarkets(key, secret);
 
 // get latest prices
 client.getTick("BTC", "AUD", function(err, data)
 {
-    console.log('bid ' + data.bestBid + ' ask ' + data.bestAsk + ' last price ' + data.lastPrice);
+   console.log(err, JSON.stringify(data));
 });
 
 // get order book
 client.getOrderBook("BTC", "AUD", function(err, data)
 {
-    console.log(data.asks.length + ' asks with best ask having price ' + data.asks[0][0] +
-        ' and amount ' + data.asks[0][1]);
+   console.log(data.asks.length + ' asks with best ask having price ' + data.asks[0][0] +
+       ' and amount ' + data.asks[0][1]);
+   console.log(err, JSON.stringify(data));
 });
 
-// limit buy order for of 0.01 BTC at 230 AUD
-client.createOrder("BTC", "AUD", 230 * numberConverter, 0.01 * numberConverter, 'Bid', 'Limit', "10001", function(err, data)
+client.getTrades("BTC", "AUD", function(err, data)
+{
+    console.log(err, JSON.stringify(data));
+});
+
+// get trades since a trade id
+client.getTrades("BTC", "AUD", function(err, data)
 {
     console.log(err, data);
+}, 728992317);
+
+// limit buy order for of 0.001 ETH at 1000 AUD
+client.createOrder("ETH", "AUD", 500 * BTCMarkets.numberConverter, 0.001 * BTCMarkets.numberConverter, 'Bid', 'Limit', "10001", function(err, data)
+{
+   console.log(err, JSON.stringify(data));
 });
 
-// market sell for 0.0001 BTC
-client.createOrder("BTC", "AUD", null, 0.0001 * numberConverter, 'Ask', 'Market', null, function(err, data)
+//market sell for 0.001 BTC
+client.createOrder("BTC", "AUD", null, 0.001 * BTCMarkets.numberConverter, 'Ask', 'Market', null, function(err, data)
 {
-    console.log(err, data);
+   console.log(err, JSON.stringify(data));
 });
 
-// cancel two limit orders with id's 123456 and 987654
-client.cancelOrder([123456,987654], function(err, data)
+// cancel two limit orders with id's 1132477709 and 1132477881
+client.cancelOrders([1132477709, 1132477881], function(err, data)
 {
-    console.log('first order was cancelled ' + data.responses[0].success);
+   console.log(err, JSON.stringify(data));
 });
 
 client.getAccountBalances(function(err, data)
 {
-    data.forEach(function(account)
-    {
-        console.log(account.currency + ' balance ' + account.balance / numberConverter + ' pending ' + account.pendingFunds / numberConverter);
-    });
+   data.forEach(function(account)
+   {
+       console.log(account.currency + ' balance ' + account.balance / BTCMarkets.numberConverter + ' pending ' + account.pendingFunds / BTCMarkets.numberConverter);
+   });
+   console.log(err, JSON.stringify(data));
 });
 
+// get trading fee for a trading pair
 client.getTradingFee("BTC", "AUD", function(err, data)
 {
-    console.log(err, data);
+    console.log(err, JSON.stringify(data));
+});
+
+// get order details
+client.getOrderDetail([206855175, 23988196], function(err, data)
+{
+   console.log(err, JSON.stringify(data));
+});
+
+// get all trades since the start of time
+client.getTradeHistory("BTC", "AUD", undefined, null, function(err, data)
+{
+   console.log(err, JSON.stringify(data));
+});
+
+// get 50 orders since the start of time
+client.getOrderHistory("BTC", "AUD", 50, null, function(err, data)
+{
+   console.log(err, data);
+});
+
+client.getOpenOrders('BTC', 'AUD', 10, null, function(err, orders)
+{
+   console.log(err, orders);
+});
+
+// withdrawal 0.05 ETH
+client.withdrawCrypto(0.05 * BTCMarkets.numberConverter, "F777fc174776879eeD1855560C37Eded66389a3b", "ETH", function(err, data)
+{
+    console.log(err, JSON.stringify(data));
+});
+
+// withdrawal 0.05 ETH
+client.withdrawHistory(null, null, null, function(err, data)
+{
+    console.log(err, JSON.stringify(data));
 });
 ```
