@@ -61,13 +61,19 @@ declare namespace BTCMarkets
         volume24h: number
     }
 
+    interface OrderBookTuple extends Array<number> {
+        0: number;  // price
+        1: number;  // amount
+        length: 2;
+    }
+
     export interface OrderBook
     {
         currency: currencies,
         instrument: instruments,
         timestamp: number,
-        asks: number[][],
-        bids: number[][]
+        asks: OrderBookTuple[],
+        bids: OrderBookTuple[]
     }
 
     export interface Trade
