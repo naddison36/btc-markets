@@ -2,7 +2,7 @@
     "name": "btc-markets",
     "version": "1.0.3",
     "description": "BTC Markets API Client for Node.JS",
-    "main": "index.js",
+    "main": "dist/index.js",
     "dependencies": {
         "cheerio": "~0.22.0",
         "request": "~2.83.0",
