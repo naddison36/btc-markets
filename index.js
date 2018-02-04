@@ -2,6 +2,7 @@
 /// <reference path="./index.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const buffer_1 = require("buffer");
+const querystring = require("querystring");
 const crypto_1 = require("crypto");
 const request = require("request");
 const cheerio = require("cheerio");
@@ -13,21 +14,34 @@ class BTCMarkets {
         this.server = server;
         this.timeout = timeout;
     }
-    privateRequest(path, params) {
+    privateRequest(path, params = {}) {
         if (!this.key || !this.secret) {
             throw new VError('must provide key and secret to make this API request.');
+        }
+        let method = 'POST';
+        // HTTP GET is used instead of POST for endpoints
+        // under /account/ eg /account/balance or /account/{instrument}/{currency}/tradingfee
+        // or /fundtransfer/history
+        if (path.split('/')[1] === 'account' ||
+            path === '/fundtransfer/history') {
+            method = 'GET';
         }
         // milliseconds elapsed between 1 January 1970 00:00:00 UTC and the given date
         const timestamp = (new Date()).getTime();
         let message;
-        if (params) {
+        if (method === 'POST') {
             message = path + "\n" +
                 timestamp + "\n" +
                 JSON.stringify(params);
         }
+        else if (Object.keys(params).length > 0) {
+            message = path + "\n" +
+                querystring.stringify(params) + "\n" +
+                timestamp + "\n";
+        }
         else {
-            // used for /account/balance
-            message = path + "\n" + timestamp + "\n";
+            message = path + "\n" +
+                timestamp + "\n";
         }
         const signer = crypto_1.createHmac('sha512', new buffer_1.Buffer(this.secret, 'base64'));
         const signature = signer.update(message).digest('base64');
@@ -37,12 +51,6 @@ class BTCMarkets {
             "timestamp": timestamp,
             "signature": signature
         };
-        let method = 'POST'; // most API's use HTTP POST so setting as default
-        // The exception is endpoints under /account/ which do a HTTP GET. eg /account/balance or /account/{instrument}/{currency}/tradingfee
-        if (path.split('/')[1] === 'account') {
-            method = 'GET';
-            params = {};
-        }
         const options = {
             url: this.server + path,
             method: method,
@@ -50,6 +58,9 @@ class BTCMarkets {
             timeout: this.timeout,
             json: params
         };
+        if (method === 'GET') {
+            options.qs = params;
+        }
         const requestDesc = `${options.method} request to url ${options.url} with message ${message}`;
         return this.executeRequest(options, requestDesc);
     }

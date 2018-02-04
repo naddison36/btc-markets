@@ -24,7 +24,7 @@ async function tests() {
         // get market trades since 728992317
         const trades = await client.getTrades("BTC", "AUD", 728992317);
         console.log(`Trades: ${JSON.stringify(trades)}`);
-        // limit buy order for of 0.001 ETH at 1000 AUD
+        // limit buy order for of 0.001 ETH at 500 AUD
         const limitOrder = await client.createOrder("ETH", "AUD", 500 * index_1.default.numberConverter, 0.001 * index_1.default.numberConverter, 'Bid', 'Limit', "10001");
         console.log(`Limit order: ${JSON.stringify(limitOrder)}`);
         //market sell for 0.001 BTC
@@ -53,8 +53,11 @@ async function tests() {
         // withdrawal 0.05 ETH
         const cryptoWithdrawal = await client.withdrawCrypto(0.05 * index_1.default.numberConverter, "0x775053A6125cB51e618Eb132f00E93d6033934AD", "ETH");
         console.log(`Crypto withdrawal: ${JSON.stringify(cryptoWithdrawal)}`);
-        // withdrawal 0.05 ETH
-        const withdrawHistory = await client.withdrawHistory(null, null, null);
+        // withdrawal history with default params
+        const defaultWithdrawHistory = await client.withdrawHistory(null, null, null);
+        console.log(`Withdrawal history: ${JSON.stringify(defaultWithdrawHistory)}`);
+        // withdrawal history with params
+        const withdrawHistory = await client.withdrawHistory(10, 0, true);
         console.log(`Withdrawal history: ${JSON.stringify(withdrawHistory)}`);
     }
     catch (err) {
