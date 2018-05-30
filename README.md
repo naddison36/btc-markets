@@ -1,6 +1,7 @@
 BTC Markets Javascript API Client
 ===============
 [![npm version](https://badge.fury.io/js/btc-markets.svg)](https://badge.fury.io/js/btc-markets)
+[![Known Vulnerabilities](https://snyk.io/test/github/naddison36/btc-markets/badge.svg)](https://snyk.io/test/github/naddison36/btc-markets)
 
 This library is a node.js wrapper for the private and public methods exposed by the [BTC Markets API](https://github.com/BTCMarkets/API).
 You will need to have a registered account with [BTC Markets](https://btcmarkets.net) and generated API keys to access the private methods.
