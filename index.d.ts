@@ -26,7 +26,7 @@ declare class BTCMarkets
     getTick(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies): Promise<BTCMarkets.Tick>;
     getOrderBook(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies): Promise<BTCMarkets.OrderBook>;
     getTrades(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, since?: number): Promise<BTCMarkets.Trade[]>;
-    createOrder(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, price: number | void, volume: number, orderSide: BTCMarkets.OrderSide, ordertype: BTCMarkets.OrderType, clientRequestId?: string | void): Promise<BTCMarkets.NewOrder>;
+    createOrder(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, price: number | void, volume: number, orderSide: BTCMarkets.OrderSide, ordertype: BTCMarkets.OrderType, clientRequestId?: string | void, triggerPrice?: number): Promise<BTCMarkets.NewOrder>;
     cancelOrders(orderIds: number[]): Promise<BTCMarkets.CancelledOrders>;
     getOrderDetail(orderIds: number[]): Promise<BTCMarkets.Orders>;
     getOpenOrders(instrument: BTCMarkets.instruments, currency: BTCMarkets.currencies, limit?: number | void, since?: number | null): Promise<BTCMarkets.Orders>;
@@ -42,11 +42,11 @@ declare class BTCMarkets
 declare namespace BTCMarkets
 {
     export type currencies = "AUD" | "BTC" //| "USD"
-    export type instruments = "BTC" | "BCH" | "ETH" | "ETC" | "LTC" | "XRP" //| "MAID" | "FCT" | "DAO"
+    export type instruments = "BTC" | "BCHABC" | "BCHSV" | "ETH" | "ETC" | "LTC" | "XRP" | "OMG" | "POWR" //| "MAID" | "FCT" | "DAO"
     export type allCurrencies = currencies | instruments
     
     export type OrderSide = "Bid" | "Ask"
-    export type OrderType = "Limit" | "Market"
+    export type OrderType = "Limit" | "Market" | "Stop Limit"
     export type OrderStatus = "New" | "Placed" | "Filled" | "Error" | "Cancelled" | "Partially Cancelled" | "Fully Matched" | "Partially Matched"
     export type WithdrawalStatus = string
 

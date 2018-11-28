@@ -31,13 +31,17 @@ async function tests(): Promise<void>
         const trades = await client.getTrades("BTC", "AUD", 728992317);
         console.log(`Trades: ${JSON.stringify(trades)}`);
 
-        // limit buy order for of 0.001 ETH at 500 AUD
-        const limitOrder = await client.createOrder("ETH", "AUD", 500 * BTCMarkets.numberConverter, 0.001 * BTCMarkets.numberConverter, 'Bid', 'Limit', "10001");
+        // limit buy order for of 0.001 ETH at 50 AUD
+        const limitOrder = await client.createOrder("ETH", "AUD", 50 * BTCMarkets.numberConverter, 0.001 * BTCMarkets.numberConverter, 'Bid', 'Limit', "10001");
         console.log(`Limit order: ${JSON.stringify(limitOrder)}`);
 
         //market sell for 0.001 BTC
         const marketOrder = await client.createOrder("BTC", "AUD", null, 0.001 * BTCMarkets.numberConverter, 'Ask', 'Market', null);
         console.log(`Market order: ${JSON.stringify(marketOrder)}`);
+
+        // limit buy order for of 0.001 ETH at 50 AUD with 40 AUD stop loss
+        const stopLossOrder = await client.createOrder("ETH", "AUD", 50 * BTCMarkets.numberConverter, 0.001 * BTCMarkets.numberConverter, 'Bid', 'Stop Limit', "10002", 40 * BTCMarkets.numberConverter);
+        console.log(`Stop loss order: ${JSON.stringify(stopLossOrder)}`);
 
         // cancel two limit orders with id's 1132477709 and 1133590603
         const cancelledOrders = await client.cancelOrders([1132477709, 1133590603]);

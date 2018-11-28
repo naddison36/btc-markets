@@ -204,7 +204,8 @@ export default class BTCMarkets
                 volume: number,
                 orderSide: BTCMarkets.OrderSide,
                 ordertype: BTCMarkets.OrderType,
-                clientRequestId: string | void = ""    // if no client id then set to an empty string
+                clientRequestId: string | void = "",    // if no client id then set to an empty string
+                triggerPrice?: number
     ): Promise<BTCMarkets.NewOrder>
     {
         const params = {
@@ -214,7 +215,8 @@ export default class BTCMarkets
             volume: volume,
             orderSide: orderSide,
             ordertype: ordertype,
-            clientRequestId: clientRequestId
+            clientRequestId: clientRequestId,
+            triggerPrice: triggerPrice
         };
 
         // @ts-ignore

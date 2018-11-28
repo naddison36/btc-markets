@@ -94,6 +94,7 @@ class BTCMarkets {
                 else if (!data) {
                     error = new VError(`failed ${requestDesc}. No data returned.`);
                 }
+                // if request was not able to parse json response into an object
                 else if (data !== Object(data)) {
                     // try and parse HTML body form response
                     const $ = cheerio.load(data);
@@ -140,8 +141,8 @@ class BTCMarkets {
     // Private API functions
     //
     createOrder(instrument, currency, price = 0, // price is not needed if a market order
-        volume, orderSide, ordertype, clientRequestId = "" // if no client id then set to an empty string
-    ) {
+    volume, orderSide, ordertype, clientRequestId = "", // if no client id then set to an empty string
+    triggerPrice) {
         const params = {
             currency: currency,
             instrument: instrument,
@@ -149,7 +150,8 @@ class BTCMarkets {
             volume: volume,
             orderSide: orderSide,
             ordertype: ordertype,
-            clientRequestId: clientRequestId
+            clientRequestId: clientRequestId,
+            triggerPrice: triggerPrice
         };
         // @ts-ignore
         return this.privateRequest('/order/create', params);
