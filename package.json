@@ -1,6 +1,6 @@
 {
     "name": "btc-markets",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "BTC Markets API Client for Node.JS",
     "main": "./index.js",
     "types": "./index.d.ts",
@@ -13,11 +13,11 @@
         "verror": "^1.10.0"
     },
     "devDependencies": {
-        "@types/cheerio": "^0.22.10",
-        "@types/node": "^10.12.10",
+        "@types/cheerio": "^0.22.12",
+        "@types/node": "^12.6.2",
         "@types/request": "^2.48.1",
         "@types/verror": "^1.10.3",
-        "typescript": "^3.1.6"
+        "typescript": "^3.5.3"
     },
     "keywords": [
         "BTC Markets",
